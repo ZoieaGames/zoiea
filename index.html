@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Zoiea</title>
+    <style>
+        body {
+            line-height: 1;
+        }
+
+        .loading {
+            display: inline-block;
+            height: 1em;
+            vertical-align: top;
+            overflow: hidden;
+        }
+
+        .loading::after {
+            display: block;
+            content: '..\A.\A';
+            white-space: pre;
+            animation: loading 3s step-end infinite;
+        }
+
+        @keyframes loading {
+            33% {
+                transform: translateY(-2em);
+            }
+
+            66% {
+                transform: translateY(-1em);
+            }
+        }
+    </style>
+</head>
+
+<body>loading.<span class="loading"></span></body>
+
+</html>
