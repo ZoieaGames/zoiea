@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "BattleCity",
+            "request": "launch",
+            "type": "msedge",
+            "url": "http://localhost/BattleCity/",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
             "name": "SuperMarioBros",
             "request": "launch",
             "type": "msedge",
