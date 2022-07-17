@@ -1,24 +1,13 @@
-import { Zoiea } from './zoiea.js';
-import image from './image.js';
-
-const images = [image.cover1, image.cover2];
-
-class Cover extends Zoiea {
+import Image from './image.js';
+import Zoiea from '../zoiea.js';
+export default class Cover extends Zoiea {
+    static image = [Image.image.cover1, Image.image.cover2];
     index = 0;
-    constructor(x, y, zoiea, tick) {
-        super(x, y, images[0]);
-        this.tank = zoiea;
-        this.tick = tick;
+    constructor(zoiea, count) {
+        super(zoiea.x, zoiea.y, Cover.image[0]);
+        ((this.other = zoiea).cover = this).count = count;
     }
     update() {
-        if (this.tick) {
-            if (--this.tick % 2 == 0) {
-                this.image = images[this.index = (this.index + 1) % 2];
-            }
-            return;
-        }
-        this.refuse();
-        this.tank.cover = undefined;
+        this.count ? --this.count % 2 || (this.image = Cover.image[++this.index % 2]) : this.other.cover = 0;
     }
 }
-export { Cover }

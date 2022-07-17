@@ -1,74 +1,63 @@
-import { World } from './world.js';
-import { Edge } from './edge.js';
-import { Map } from './map.js';
-import { Debug } from './debug.js';
-import { Pause } from './pause.js';
-import { Panel } from './panel.js';
-import { Media } from './media.js';
-
+import Media from '../media.js';
+import Stage from './stage.js';
+import Text from '../text.js';
+import World from '../world.js';
 class Main extends World {
-    media = new Media();
+    media = new Media('BattleCity');
+    live = 3;
+    index = 0;
+    offset = 0;
     constructor() {
         super();
         this.init();
-        this.uiAppend(this.finished = this.pause = new Pause('ZOIEA GAMES'));
+        this.create(this.finished = new Text(8, 8, 'ZOIEA GAMES'));
+        super.play();
+        this.stop();
+        document.onkeyup = document.onkeydown = event => this.on(event);
     }
     init() {
-        this.zoieas = [];
-        this.append(new Edge(0, 0, { width: 360, height: 32 }));
-        this.append(new Edge(0, 32, { width: 64, height: 208 }));
-        this.append(new Edge(272, 32, { width: 88, height: 208 }));
-        this.append(new Edge(0, 240, { width: 360, height: 30 }));
-        Map.init(this);
-        this.ui = [];
-        this.uiAppend(new Debug(360, 0));
-        this.uiAppend(this.panel = new Panel(280, 40));
-    }
-    enter() {
-        if (this.finished) {
-            this.id += this.zoieas.length + this.ui.length;
-            this.init();
-            this.finished = this.pause = void this.pause.refuse();
-            this.playing || this.play();
-            this.media.play(5).then(() => this.media.play(4, true));
-            return;
-        }
-        if (this.playing) {
-            this.uiAppend(this.pause = new Pause('PAUSED'));
-            this.stop();
-            this.media.stop(4);
-        } else {
-            this.pause = void this.pause.refuse();
-            this.play();
-            this.media.play(4, true);
-        }
+        this.zoieas.length = 0;
+        Stage.next(this);
     }
     over() {
-        if (this.finished) {
-            return;
-        }
-        this.uiAppend(this.finished = this.pause = new Pause('GAME OVER'));
-        this.panel.update = undefined;
-        this.zoiea.moving = 0;
-        this.zoiea = undefined;
+        if (this.finished) return;
+        this.create(this.finished = new Text(8, 8, 'GAME OVER'));
+        ++this.live;
+        delete this.zoiea;
+        this.media.stop(5);
         this.media.stop(4);
     }
-    onDown(event) {
-        super.onDown(event);
-        switch (event.code) {
-            case 'KeyX':
-                this.zoiea?.fire(1);
-                break;
+    play() {
+        if (this.finished) {
+            this.finished = this.damage(this.finished);
+            this.index = Math.random() * Stage.stage.length >> 0;
+            this.init();
+            this.playing || super.play();
+            return this.media.play(5).then(() => this.finished || this.paused || this.media.play(4, true));
         }
+        if (this.paused) {
+            this.paused = this.damage(this.paused);
+            super.play();
+            return this.media.play(4, true);
+        }
+        this.create(this.paused = new Text(8, 8, 'PAUSED'));
+        requestAnimationFrame(() => this.stop());
+        this.media.stop(5);
+        this.media.stop(4);
     }
-    onUp(event) {
-        super.onUp(event);
+    on(event) {
+        if (event.code === 'Enter' && event.type === 'keyup') return this.play();
+        if (!this.zoiea) return;
         switch (event.code) {
-            case 'KeyX':
-                this.zoiea?.fire(0);
+            case 'ArrowRight': this.zoiea.move(event.type === 'keyup' ? -1 : 1);
                 break;
-            case 'Enter':
-                this.enter();
+            case 'ArrowUp': this.zoiea.move(event.type === 'keyup' ? -2 : 2);
+                break;
+            case 'ArrowLeft': this.zoiea.move(event.type === 'keyup' ? -3 : 3);
+                break;
+            case 'ArrowDown': this.zoiea.move(event.type === 'keyup' ? -4 : 4);
+                break;
+            case 'KeyX': this.zoiea.action(event.type !== 'keyup');
                 break;
         }
     }

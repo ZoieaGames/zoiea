@@ -1,19 +1,14 @@
-import { Zoiea } from './zoiea.js';
-import image from './image.js';
-
-const images = [image.water1, image.water2];
-
-class Water extends Zoiea {
+import Actor from '../actor.js';
+import Image from './image.js';
+export default class Water extends Actor {
+    static image = [Image.image.water1, Image.image.water2];
     type = 2;
+    count = 0;
     index = 0;
-    tick = 0;
     constructor(x, y) {
-        super(x, y, images[0]);
+        super(x, y, Water.image[0]);
     }
     update() {
-        if (++this.tick % 32 == 0) {
-            this.image = images[this.index = (this.index + 1) % 2];
-        }
+        ++this.count % 32 || (this.image = Water.image[++this.index % 2]);
     }
 }
-export { Water }

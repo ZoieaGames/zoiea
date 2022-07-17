@@ -1,30 +1,27 @@
-import { Zoiea } from './zoiea.js';
-import { flag1, pole1 } from './sprite.js';
-
-class Flag extends Zoiea {
+import Actor from '../actor.js';
+import Graph from '../graph.js';
+import Image from './image.js';
+export default class Flag extends Actor {
+    static image = {
+        1: Graph.grid([Image.image.flag3, Image.image.flag4], [{ width: 8, height: 8 }, Image.image.flag3]),
+        2: Graph.grid([Image.image.flag2], [{ width: 3, height: 144 }, Graph.rect(2, 144, '#89d900')]),
+    }
+    type = 2;
+    count = 63;
+    offset = 0;
     constructor(x, y) {
-        super(x + 12, y, pole1);
-        this.flag = true;
-        this.offset = 0;
+        super(x + 12, y, Flag.image[2]);
     }
-    fuck() {
-        this.ghost = true;
-        this.offset += 2;
-        this.step = 61;
-        this.update = this.update0;
-
+    redraw() {
+        super.redraw();
+        this.zoiea.context.drawImage(Flag.image[1], this.x - 12, this.y + this.offset + 9);
     }
-    update0() {
-        if (--this.step) {
-            this.offset += 2;
-        } else {
-            this.update = undefined;
-        }
+    flagUpdate() {
+        --this.count ? this.offset += 2 : delete this.update;
     }
-    redraw(zoiea) {
-        zoiea.context.drawImage(pole1, this.x, this.y);
-        zoiea.context.drawImage(flag1, this.x - 12, this.y + 9 + this.offset);
+    ruin() {
+        this.type = 0;
+        this.update = this.flagUpdate;
+        this.zoiea.media.play(14);
     }
 }
-
-export { Flag }

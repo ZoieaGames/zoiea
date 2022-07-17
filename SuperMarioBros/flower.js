@@ -1,63 +1,40 @@
-import { Zoiea } from './zoiea.js';
-import { flower0, flower1, flower2, flower3 } from './sprite.js';
-
-const images = [flower0, flower1, flower2, flower3];
-
-class Flower extends Zoiea {
-    constructor(x, y) {
-        super(x + 1, y + 5, flower0);
-        this.width -= 2;
-        this.height -= 6;
-        this.step = 1;
-        this.z = y - this.height;
-        this.state = 0;
-        this.invisible = true;
-        this.bitch = true;
+import Actor from '../actor.js';
+import Graph from '../graph.js';
+import Image from './image.js';
+export default class Flower extends Actor {
+    static image = [
+        Image.image.flower1,
+        Graph.change(Image.image.flower1, 0, 254, 254, 205, 198, 235, 153, 79, 0, 181, 0, 0, 0),
+        Graph.change(Image.image.flower1, 0, 254, 235, 159, 35, 235, 108, 110, 0),
+        Graph.change(Image.image.flower1, 0, 181, 13, 148, 0),
+    ];
+    count = 0;
+    index = 0;
+    constructor(zoiea) {
+        super(zoiea.x, zoiea.y, Flower.image[0]);
+        this.o.y = this.o.x = 1;
+        this.offset = this.y - 15;
+        this.update = this.riseUpdate;
     }
-    redraw(zoiea) {
-        zoiea.context.drawImage(this.image, this.x - 1, this.y - 5);
+    riseUpdate() {
+        this.vary();
+        if (++this.count % 4 || --this.y !== this.offset) return;
+        this.zoiea.append(this);
+        this.update = this.varyUpdate;
     }
-    fuck() {
-        this.ghost = true;
-        this.update = this.update3;
-    }
-    update() {
-        if (++this.step % 4 === 0) {
-            this.y -= 4;
-            this.update = this.update0;
+    varyUpdate() {
+        this.vary();
+        for (const zoiea of this.zoiea.zoieas) {
+            if (zoiea.camp !== 1 || !this.in(zoiea)[0]) continue;
+            zoiea.up();
+            this.ruin();
+            break;
         }
     }
-    update0() {
-        if (++this.step % 2 === 0) {
-            this.state = (this.state + 1) % 4;
-            this.image = images[this.state];
-        }
-        if (this.step % 4 === 0) {
-            if (--this.y === this.z) {
-                this.update = this.update1;
-            }
-        }
+    vary() {
+        ++this.count % 2 || (this.image = Flower.image[++this.index % 4]);
     }
-    update1() {
-        if (++this.step % 2 === 0) {
-            this.state = (this.state + 1) % 4;
-            this.image = images[this.state];
-        }
-        if (this.step < 5) {
-            ++this.x;
-        } else {
-            this.update = this.update2;
-        }
-    }
-    update2() {
-        if (++this.step % 2 === 0) {
-            this.state = (this.state + 1) % 4;
-            this.image = images[this.state];
-        }
-    }
-    update3() {
-        this.refuse();
+    ruin() {
+        delete this.zoiea;
     }
 }
-
-export { Flower }

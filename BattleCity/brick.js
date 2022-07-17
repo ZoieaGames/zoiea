@@ -1,17 +1,14 @@
-import { Zoiea } from './zoiea.js';
-import image from './image.js';
-
-const brick0 = await createImageBitmap(image.brick1, 0, 0, 4, 4);
-const brick1 = await createImageBitmap(image.brick1, 4, 0, 4, 4);
-
-class Brick extends Zoiea {
+import Actor from '../actor.js';
+import Graph from '../graph.js';
+import Image from './image.js';
+export default class Brick extends Actor {
+    static image = { 1: Graph.crop(Image.image.brick1, 4, 0, 4, 4), 2: Graph.crop(Image.image.brick1, 0, 0, 4, 4) };
     type = 3;
-    constructor(x, y, type) {
-        super(x, y, type ? brick1 : brick0);
+    constructor(x, y, direction) {
+        super(x, y, Brick.image[direction]);
     }
-    bomb() {
-        this.refuse();
+    ruin() {
+        this.type = 0;
+        delete this.zoiea;
     }
 }
-
-export { Brick }

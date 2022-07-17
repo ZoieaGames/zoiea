@@ -1,34 +1,17 @@
-import { Zoiea } from './zoiea.js';
-import { coin0, coin1, coin2, coin3 } from './sprite.js';
-
-const images = [coin1, coin2, coin3, coin0];
-const fucks = [
-    0, 0, -5, -5, -4, -3, -4, -3, -3, -2, -2, -2, -2, -2, 0, -1, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 3, 4, 5
-];
-
-class Coin extends Zoiea {
-    constructor(x, y) {
-        super(x, y, coin1);
-        this.step = 1;
-        this.state = 1;
-        this.count = 0;
-        this.ghost = true;
+import Image from './image.js';
+import Zoiea from '../zoiea.js';
+export default class Coin extends Zoiea {
+    static image = [Image.image.coin2, Image.image.coin3, Image.image.coin4, Image.image.coin5];
+    static offset = [
+        0, 0, -5, -5, -4, -3, -4, -3, -3, -2, -2, -2, -2, -2, 0, -1, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 3, 4, 5,
+    ];
+    count = 0;
+    index = 0;
+    constructor(zoiea) {
+        super(zoiea.x + 5, zoiea.y - 20, Coin.image[0]);
     }
     update() {
-        if (++this.step % 2 === 0) {
-            this.image = images[this.state];
-            if (++this.state === 4) {
-                this.state = 0;
-                if (++this.count === 4) {
-                    this.update = this.update0;
-                }
-            }
-        }
-        this.y += fucks[this.step];
-    }
-    update0() {
-        this.refuse();
+        this.y += Coin.offset[this.count];
+        ++this.count % 2 || (this.count === 32 ? delete this.zoiea : this.image = Coin.image[++this.index % 4]);
     }
 }
-
-export { Coin };

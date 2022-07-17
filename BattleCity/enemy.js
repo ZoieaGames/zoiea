@@ -1,102 +1,64 @@
-import { Tank } from './tank.js';
-import { Bullet } from './bullet.js';
-import { image, flipX, flipY, rotate } from './image.js';
-
-const images = {
-    1: { 1: [image.tank1, image.tank2] },
-    2: { 1: [image.tank3, image.tank4] },
-    3: { 1: [image.tank5, image.tank6] },
-    4: { 1: [image.tank7, image.tank8] }
-}
-for (const image of Object.values(images)) {
-    image[2] = [rotate(image[1][0]), rotate(image[1][1])];
-}
-for (const image of Object.values(images)) {
-    image[3] = [flipY(image[1][0]), flipY(image[1][1])];
-}
-for (const image of Object.values(images)) {
-    image[4] = [flipX(image[2][0]), flipX(image[2][1])];
-}
-
-const random = (size, base) => {
-    return Math.random() * size + base >> 0;
-}
-
-class Enemy extends Tank {
-    direction = 3;
+import Bullet from './bullet.js';
+import Graph from '../graph.js';
+import Image from './image.js';
+import Prop from './prop.js';
+import Tank from './tank.js';
+export default class Enemy extends Tank {
+    static image = {
+        1: { 2: [Image.image.tank1, Image.image.tank2] },
+        2: { 2: [Image.image.tank3, Image.image.tank4] },
+        3: { 2: [Image.image.tank5, Image.image.tank6] },
+        4: { 2: [Image.image.tank7, Image.image.tank8] },
+    };
+    static {
+        for (const image of Object.values(this.image)) {
+            image[2].forEach(i => image[2].push(Graph.change(i, 1, 174, 181, 50, 32, 64, 92, 0, 126)));
+            image[1] = [];
+            for (const i of image[2]) image[1].push(Graph.rotate(i));
+            image[3] = [];
+            for (const i of image[1]) image[3].push(Graph.flipX(i));
+            image[4] = [];
+            for (const i of image[2]) image[4].push(Graph.flipY(i));
+        }
+    }
+    static random(size, base) {
+        return Math.random() * size + base >> 0;
+    }
     velocity = .5;
-    camp = 2;
-    tick = 0;
     bullet = 1;
-    factor = random(480, 240);
-    constructor(x, y, level) {
-        super(x, y, images[level][3]);
-        this.level = level;
-        if (level === 2) {
-            this.velocity = 1;
-        } else if (level > 2) {
-            this.bullet = 2;
-        }
+    factor = Enemy.random(480, 240);
+    camp = 2;
+    constructor(zoiea, level) {
+        super(zoiea.x - 96 + (++zoiea.index % 3) * 96, zoiea.y - 192, Enemy.image);
+        this.other = zoiea;
+        if (level < 0) {
+            this.level = -level;
+            this.offset = 2;
+        } else this.level = level;
+        if (level === 2) this.velocity = 1;
+        else if (level > 2) this.bullet = 2;
+        this.turn(Enemy.random(4, 1));
     }
-    nextUpdate() {
-        if (++this.tick % 60 === 0 && this.bullet) {
+    moveUpdate() {
+        if (this.other.limit) return;
+        if (!(++this.count % 60) && this.bullet) {
             --this.bullet;
-            this.zoiea.append(new Bullet(this.x, this.y, this));
+            this.zoiea.append(new Bullet(this));
         }
-        if (this.tick % this.factor === 0) {
-            this.tick = random(120, 60);
-            this.direction = random(4, 1);
-            this.update = this.imageUpdate;
-            return;
+        if (!(this.count % this.factor)) {
+            this.factor = Enemy.random(120, 60);
+            this.turn(Enemy.random(4, 1));
         }
-        this.image = this.images[this.index = (this.index + 1) % 2];
-        this.go();
-        this.collision();
+        super.moveUpdate();
     }
-    imageUpdate() {
-        this.images = images[this.level][this.direction];
-        this.image = this.images[this.index];
-        this.update = this.nextUpdate;
+    bump(result) {
+        super.bump(result);
+        this.turn(result[1] === 1 ? 4 : Enemy.random(4, 1));
     }
-    collision(result) {
-        for (const zoiea of this.zoiea.zoieas) {
-            if (zoiea === this || !zoiea.type || zoiea.type === 4) {
-                continue;
-            }
-            if (result = this.collide(zoiea)) {
-                if (result[1] === 0) {
-                    continue;
-                }
-                switch (result[0]) {
-                    case 1:
-                        this.y += result[1];
-                        this.direction = random(4, 1);
-                        break;
-                    case 2:
-                        this.x -= result[1];
-                        this.direction = 3;
-                        break;
-                    case 3:
-                        this.y -= result[1];
-                        this.direction = random(4, 1);
-                        break;
-                    case 4:
-                        this.x += result[1];
-                        this.direction = random(4, 1);
-                        break;
-                }
-                this.update = this.imageUpdate;
-            }
-        }
-    }
-    refuse() {
-        super.refuse();
-        this.zoiea.panel.remove(this);
-    }
-    bomb() {
-        super.bomb();
+    ruin() {
+        this.offset && this.zoiea.append(new Prop(this.other, Math.ceil(Math.random() * 6)));
+        this.other.others.delete(this);
         this.zoiea.media.play(2);
+        super.ruin();
     }
 }
-
-export { Enemy }

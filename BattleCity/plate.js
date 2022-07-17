@@ -1,20 +1,13 @@
-import { Zoiea } from './zoiea.js';
-import image from './image.js';
-
-class Plate extends Zoiea {
+import Actor from '../actor.js';
+import Image from './image.js';
+export default class Plate extends Actor {
     type = 3;
     constructor(x, y) {
-        super(x, y, image.plate1);
+        super(x, y, Image.image.plate1);
     }
-    bomb(zoiea) {
-        if (zoiea.level === 4) {
-            this.refuse();
-            return;
-        }
-        if (zoiea.camp === 1) {
-            this.zoiea.media.play(3);
-        }
+    ruin(zoiea) {
+        if (zoiea.level !== 4) return zoiea.camp === 1 && this.zoiea.media.play(3);
+        this.type = 0;
+        delete this.zoiea;
     }
 }
-
-export { Plate }

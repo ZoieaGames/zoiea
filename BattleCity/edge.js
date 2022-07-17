@@ -1,20 +1,17 @@
-import { Zoiea } from './zoiea.js';
-
-class Edge extends Zoiea {
+import Actor from '../actor.js';
+import Graph from '../graph.js';
+export default class Edge extends Actor {
+    static image = {
+        1: Graph.rect(32, 208, '#666'),
+        2: Graph.rect(256, 32, '#666'),
+        3: Graph.rect(16, 208, '#666'),
+        4: Graph.rect(256, 30, '#666'),
+    };
     type = 1;
-    fillStyle = '#666';
-    constructor(x, y, image) {
-        super(x, y, image);
+    constructor(x, y, direction) {
+        super(x, y, Edge.image[direction]);
     }
-    redraw() {
-        this.zoiea.context.fillStyle = this.fillStyle;
-        this.zoiea.context.fillRect(this.x, this.y, this.width, this.height);
-    }
-    bomb(zoiea) {
-        if (zoiea.camp === 1) {
-            this.zoiea.media.play(3);
-        }
+    ruin(zoiea) {
+        zoiea.camp === 1 && this.zoiea.media.play(3);
     }
 }
-
-export { Edge };
