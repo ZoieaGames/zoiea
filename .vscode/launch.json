@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Contra",
+            "request": "launch",
+            "type": "msedge",
+            "url": "http://localhost/Contra/",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
             "name": "BattleCity",
             "request": "launch",
             "type": "msedge",
