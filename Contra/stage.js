@@ -1,6 +1,6 @@
 import Bridge from './bridge.js';
 import Bush from './bush.js';
-import Lawn from './Lawn.js';
+import Lawn from './lawn.js';
 import Rect from './rect.js';
 import Rock from './rock.js';
 import Tree from './tree.js';
