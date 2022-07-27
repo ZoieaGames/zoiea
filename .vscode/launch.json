@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "PlantsVsZombies",
+            "request": "launch",
+            "type": "msedge",
+            "url": "http://localhost/PlantsVsZombies/",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
             "name": "Contra",
             "request": "launch",
             "type": "msedge",
