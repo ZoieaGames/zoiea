@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Piano",
+            "request": "launch",
+            "type": "msedge",
+            "url": "http://localhost/Piano/",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
             "name": "PlantsVsZombies",
             "request": "launch",
             "type": "msedge",
